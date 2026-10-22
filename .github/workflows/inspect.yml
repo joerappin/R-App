@@ -1,0 +1,23 @@
+# Lecture seule : affiche l'arborescence FTP pour vérifier le bon dossier avant un déploiement.
+name: Inspection FTP
+
+on:
+  workflow_dispatch:
+    inputs:
+      chemin:
+        description: "Dossier à lister"
+        default: "/"
+
+jobs:
+  lister:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Lister le dossier
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          CHEMIN: ${{ inputs.chemin }}
+        run: |
+          echo "== $CHEMIN"
+          curl -s --ftp-pasv --user "$FTP_USERNAME:$FTP_PASSWORD" "ftp://$FTP_SERVER/${CHEMIN#/}/" --list-only
