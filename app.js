@@ -27,7 +27,11 @@
 
     key.addEventListener("click", function (e) {
       press(key);
-      if (!active) e.preventDefault();
+      if (!active) return e.preventDefault();
+      if (app.wake) {
+        e.preventDefault();
+        launch(key, app);
+      }
     });
 
     deck.appendChild(key);
@@ -39,12 +43,61 @@
     key.classList.add("is-pressed");
   }
 
+  // Vérifie que l'app répond; si elle se réveille, affiche un compte à rebours sur la touche.
+  function launch(key, app) {
+    if (key.classList.contains("is-waking")) return;
+    var ready = false;
+    var timer = null;
+    var open = function () {
+      ready = true;
+      clearInterval(timer);
+      window.location.href = app.url;
+    };
+
+    waitUntilUp(app.wake, open);
+
+    // Réponse rapide : on ouvre directement, sans compte à rebours
+    setTimeout(function () {
+      if (ready) return;
+      var left = app.wakeSeconds || 50;
+      var wait = document.createElement("span");
+      wait.className = "key-wait";
+      wait.innerHTML = '<span class="key-count"></span><span class="key-wait-text">Démarrage…</span>';
+      key.querySelector(".key-screen").appendChild(wait);
+      key.classList.add("is-waking");
+      var count = wait.querySelector(".key-count");
+      var tick = function () {
+        count.textContent = left > 0 ? left : "…";
+        if (left <= 0) wait.querySelector(".key-wait-text").textContent = "Presque prêt";
+        left--;
+      };
+      tick();
+      timer = setInterval(tick, 1000);
+    }, 1200);
+  }
+
+  function waitUntilUp(url, done) {
+    fetch(url, { cache: "no-store" })
+      .then(function (res) {
+        if (!res.ok) throw new Error(res.status);
+        done();
+      })
+      .catch(function () {
+        setTimeout(function () { waitUntilUp(url, done); }, 2000);
+      });
+  }
+
+  // Retour arrière depuis l'app : la page revient du cache, on retire les comptes à rebours
+  window.addEventListener("pageshow", function (e) {
+    if (!e.persisted) return;
+    deck.querySelectorAll(".key-wait").forEach(function (w) { w.remove(); });
+    deck.querySelectorAll(".is-waking").forEach(function (k) { k.classList.remove("is-waking"); });
+  });
+
   // Touches 1 à 6 du clavier, comme sur un Stream Deck
   document.addEventListener("keydown", function (e) {
     if (e.metaKey || e.ctrlKey || e.altKey) return;
     var key = deck.querySelector('[data-index="' + e.key + '"]');
-    if (!key) return;
-    press(key);
-    if (key.href) setTimeout(function () { window.location.href = key.href; }, 140);
+    if (key) key.click();
   });
 })();
