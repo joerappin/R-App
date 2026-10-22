@@ -1,0 +1,164 @@
+:root {
+  --bg: #0b0d12;
+  --body: #161922;
+  --body-edge: #232736;
+  --text: #f2f4f8;
+  --muted: #8a90a2;
+  --radius: 18px;
+}
+
+* { box-sizing: border-box; }
+
+html, body { height: 100%; }
+
+body {
+  margin: 0;
+  background: radial-gradient(1200px 600px at 50% -10%, #1c2130 0%, var(--bg) 60%);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.deck-wrap {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  padding: 32px 16px;
+}
+
+.brand { text-align: center; }
+.brand h1 {
+  margin: 0;
+  font-size: clamp(2.2rem, 6vw, 3.4rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.brand .accent { color: #ffb020; }
+.brand p { margin: 6px 0 0; color: var(--muted); }
+
+/* Le boîtier du "Stream Deck" */
+.deck {
+  width: 100%;
+  max-width: 620px;
+  padding: 22px;
+  border-radius: 28px;
+  background: linear-gradient(180deg, #1b1f2b, var(--body));
+  border: 1px solid var(--body-edge);
+  box-shadow:
+    0 30px 60px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.deck-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+/* Une touche */
+.key {
+  position: relative;
+  aspect-ratio: 1;
+  display: block;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius);
+  background: #07080b;
+  color: inherit;
+  text-decoration: none;
+  font: inherit;
+  cursor: pointer;
+  box-shadow:
+    0 6px 0 #05060a,
+    0 10px 18px rgba(0, 0, 0, 0.5),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.key-screen {
+  position: absolute;
+  inset: 8px;
+  border-radius: calc(var(--radius) - 6px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background:
+    radial-gradient(circle at 50% 35%, color-mix(in srgb, var(--key-color) 55%, transparent), transparent 70%),
+    linear-gradient(160deg, color-mix(in srgb, var(--key-color) 35%, #0d0f15), #0d0f15);
+  overflow: hidden;
+}
+
+.key-icon {
+  font-size: clamp(1.8rem, 7vw, 2.8rem);
+  line-height: 1;
+  filter: drop-shadow(0 0 10px color-mix(in srgb, var(--key-color) 80%, transparent));
+}
+
+.key-label {
+  font-weight: 700;
+  font-size: clamp(0.8rem, 2.8vw, 1rem);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+.key-soon {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.key-num {
+  position: absolute;
+  top: 12px;
+  left: 14px;
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.key:hover .key-screen { filter: brightness(1.15); }
+
+.key:focus-visible {
+  outline: 2px solid var(--key-color);
+  outline-offset: 4px;
+}
+
+.key:active,
+.key.is-pressed {
+  transform: translateY(5px);
+  box-shadow:
+    0 1px 0 #05060a,
+    0 3px 8px rgba(0, 0, 0, 0.5),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+.key.is-pressed .key-screen { animation: flash 0.35s ease-out; }
+
+@keyframes flash {
+  0%   { box-shadow: inset 0 0 0 999px color-mix(in srgb, var(--key-color) 45%, transparent); }
+  100% { box-shadow: inset 0 0 0 999px transparent; }
+}
+
+.key.is-off { cursor: default; }
+.key.is-off .key-screen { filter: saturate(0.35) brightness(0.7); }
+.key.is-off:hover .key-screen { filter: saturate(0.5) brightness(0.8); }
+
+.foot {
+  color: var(--muted);
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+@media (max-width: 420px) {
+  .deck { padding: 14px; border-radius: 22px; }
+  .deck-grid { gap: 10px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .key, .key.is-pressed .key-screen { transition: none; animation: none; }
+}
