@@ -7,7 +7,7 @@ window.R_APPS = [
   { name: "ReviZ",  icon: "⚡", color: "#ffb020", url: "https://joerappin.github.io/Revisions/" },
   // Une fois ReviZ sur Render, remplacer la ligne ci-dessus par :
   // { name: "ReviZ", icon: "⚡", color: "#ffb020", url: "https://reviz.onrender.com/", wake: "https://reviz.onrender.com/api/status", wakeSeconds: 50 },
-  { name: "App 2",  icon: "🎬", color: "#4f8cff", url: "" },
+  { name: "ESC",    icon: "🏫", color: "#0b5d9e", url: "https://levelstudios-corp.com/esc/" },
   { name: "App 3",  icon: "🎵", color: "#b45cff", url: "" },
   { name: "App 4",  icon: "📅", color: "#22c55e", url: "" },
   { name: "App 5",  icon: "💬", color: "#ff4d6d", url: "" },
