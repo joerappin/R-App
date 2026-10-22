@@ -19,7 +19,5 @@ jobs:
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
           CHEMIN: ${{ inputs.chemin }}
         run: |
-          for u in "$FTP_USERNAME" "$FTP_USERNAME.levelstudios-corp.com"; do
-            echo "== utilisateur ${u/$FTP_USERNAME/<FTP_USERNAME>} · $CHEMIN"
-            curl -s --ftp-pasv --user "$u:$FTP_PASSWORD" "ftp://$FTP_SERVER/${CHEMIN#/}/" --list-only && echo "OK" || echo "refusé (code $?)"
-          done
+          echo "== $CHEMIN"
+          curl -sS --ftp-pasv --connect-timeout 20 --max-time 90 --user "$FTP_USERNAME:$FTP_PASSWORD" "ftp://$FTP_SERVER/${CHEMIN#/}/" --list-only
