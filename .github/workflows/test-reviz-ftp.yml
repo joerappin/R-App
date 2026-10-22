@@ -1,0 +1,39 @@
+# Diagnostic : rejoue les étapes FTP de ReviZ (connexion, dossier, .htaccess, téléchargement) avec le journal détaillé.
+name: Test FTP ReviZ
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Rejouer les étapes FTP
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_PASSWORD: ${{ secrets.REVIZ_FTP_PASSWORD }}
+        run: |
+          npm i basic-ftp@5 --silent
+          cat > t.mjs <<'EOF'
+          import { Client } from "basic-ftp";
+          import { Readable } from "node:stream";
+          import fs from "node:fs";
+          const c = new Client(30e3);
+          c.ftp.verbose = true;
+          try {
+            await c.access({ host: process.env.FTP_SERVER, user: "u861229136.reviz", password: process.env.FTP_PASSWORD });
+            console.log("== pwd", await c.pwd());
+            await c.ensureDir("/");
+            console.log("== ensureDir ok");
+            await c.uploadFrom(Readable.from(["Require all denied\n"]), ".htaccess");
+            console.log("== htaccess ok");
+            fs.mkdirSync("d", { recursive: true });
+            await c.downloadToDir("d");
+            console.log("== download ok");
+          } catch (e) { console.log("== ÉCHEC", e.message); process.exitCode = 1; }
+          c.close();
+          EOF
+          node t.mjs 2>&1 | grep -v "^> PASS"
