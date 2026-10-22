@@ -19,5 +19,7 @@ jobs:
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
           CHEMIN: ${{ inputs.chemin }}
         run: |
-          echo "== $CHEMIN"
-          curl -s --ftp-pasv --user "$FTP_USERNAME:$FTP_PASSWORD" "ftp://$FTP_SERVER/${CHEMIN#/}/" --list-only
+          for u in "$FTP_USERNAME" "$FTP_USERNAME.levelstudios-corp.com"; do
+            echo "== utilisateur ${u/$FTP_USERNAME/<FTP_USERNAME>} · $CHEMIN"
+            curl -s --ftp-pasv --user "$u:$FTP_PASSWORD" "ftp://$FTP_SERVER/${CHEMIN#/}/" --list-only && echo "OK" || echo "refusé (code $?)"
+          done
