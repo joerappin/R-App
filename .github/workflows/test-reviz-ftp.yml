@@ -1,5 +1,5 @@
-# Diagnostic : rejoue les étapes FTP de ReviZ (connexion, dossier, .htaccess, téléchargement) avec le journal détaillé.
-name: Test FTP ReviZ
+# Diagnostic : quels envois FTP Hostinger accepte (fichier normal vs .htaccess) dans un dossier de test.
+name: Test FTP
 
 on:
   workflow_dispatch:
@@ -8,32 +8,17 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24
-      - name: Rejouer les étapes FTP
+      - name: Envois de test
         env:
-          FTP_SERVER: ${{ secrets.FTP_SERVER }}
-          FTP_PASSWORD: ${{ secrets.REVIZ_FTP_PASSWORD }}
+          FTP: ftp://${{ secrets.FTP_SERVER }}/domains/levelstudios-corp.com/test-ftp
+          FTP_AUTH: ${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}
         run: |
-          npm i basic-ftp@5 --silent
-          cat > t.mjs <<'EOF'
-          import { Client } from "basic-ftp";
-          import { Readable } from "node:stream";
-          import fs from "node:fs";
-          const c = new Client(30e3);
-          c.ftp.verbose = true;
-          try {
-            await c.access({ host: process.env.FTP_SERVER, user: "u861229136.reviz", password: process.env.FTP_PASSWORD });
-            console.log("== pwd", await c.pwd());
-            await c.ensureDir("/");
-            console.log("== ensureDir ok");
-            await c.uploadFrom(Readable.from(["Require all denied\n"]), ".htaccess");
-            console.log("== htaccess ok");
-            fs.mkdirSync("d", { recursive: true });
-            await c.downloadToDir("d");
-            console.log("== download ok");
-          } catch (e) { console.log("== ÉCHEC", e.message); process.exitCode = 1; }
-          c.close();
-          EOF
-          node t.mjs 2>&1 | grep -v "^> PASS"
+          echo bonjour > a.txt
+          printf 'Require all denied\n' > h
+          t() { echo "== $1"; curl -sS --ftp-pasv --ftp-create-dirs --max-time 60 --user "$FTP_AUTH" -T "$2" "$FTP/$1" && echo OK || echo "ÉCHEC $?"; }
+          t a.txt a.txt
+          t .htaccess h
+          t htaccess.txt h
+          echo "== liste"; curl -sS --ftp-pasv --max-time 60 --user "$FTP_AUTH" "$FTP/" --list-only
+          for f in a.txt .htaccess htaccess.txt; do curl -sS --max-time 30 --user "$FTP_AUTH" -Q "DELE /domains/levelstudios-corp.com/test-ftp/$f" "$FTP/" -o /dev/null; done
+          curl -sS --max-time 30 --user "$FTP_AUTH" -Q "RMD /domains/levelstudios-corp.com/test-ftp" "ftp://${{ secrets.FTP_SERVER }}/" -o /dev/null && echo "nettoyé"
