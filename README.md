@@ -10,7 +10,8 @@ Un bouton sans `url` s'affiche « Bientôt ».
 
 ## Mise en ligne
 
-Site statique (HTML/CSS/JS, aucun build). Chaque `git push` sur `main` est déployé par Hostinger
-(hPanel → levelstudios-corp.com → Avancé → Git) dans `public_html`.
+Site statique (HTML/CSS/JS, aucun build). Chaque `git push` sur `main` est envoyé par FTP
+dans `public_html` de levelstudios-corp.com via GitHub Actions ([deploy.yml](.github/workflows/deploy.yml)).
+Secrets requis : `FTP_SERVER`, `FTP_USERNAME`, `FTP_PASSWORD` (hPanel → levelstudios-corp.com → Fichiers → Comptes FTP).
 
 > ⚠️ Ne jamais toucher au dépôt ni à l'hébergement de **levelstudios.ca**.
