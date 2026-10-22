@@ -10,6 +10,10 @@ on:
       utilisateur:
         description: "Utilisateur FTP (vide = secret FTP_USERNAME)"
         default: ""
+      compte_reviz:
+        description: "Utiliser le mot de passe du compte FTP ReviZ"
+        type: boolean
+        default: false
 
 jobs:
   lister:
@@ -19,7 +23,7 @@ jobs:
         env:
           FTP_SERVER: ${{ secrets.FTP_SERVER }}
           FTP_USERNAME: ${{ inputs.utilisateur || secrets.FTP_USERNAME }}
-          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_PASSWORD: ${{ inputs.compte_reviz && secrets.REVIZ_FTP_PASSWORD || secrets.FTP_PASSWORD }}
           CHEMIN: ${{ inputs.chemin }}
         run: |
           echo "== $CHEMIN"
