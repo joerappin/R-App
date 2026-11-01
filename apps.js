@@ -4,7 +4,7 @@
 // `wake` (facultatif) : adresse vérifiée avant d'ouvrir l'app (hébergement gratuit en veille);
 // si l'app dort, la touche affiche un compte à rebours de `wakeSeconds` puis l'ouvre dès qu'elle répond.
 window.R_APPS = [
-  { name: "ReviZ",  icon: "⚡", color: "#ffb020", url: "https://joerappin.github.io/Revisions/" },
+  { name: "ReviZ",  icon: "⚡", color: "#ffb020", url: "https://levelstudios-corp.com/reviz/" },
   // Une fois ReviZ sur Render, remplacer la ligne ci-dessus par :
   // { name: "ReviZ", icon: "⚡", color: "#ffb020", url: "https://reviz.onrender.com/", wake: "https://reviz.onrender.com/api/status", wakeSeconds: 50 },
   { name: "ESC",    icon: "🏫", color: "#0b5d9e", url: "https://levelstudios-corp.com/esc/" },
